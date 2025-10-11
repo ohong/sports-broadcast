@@ -1,4 +1,4 @@
-Design Teardown: Oceanic Pastel UI (Kawaii‑DeFi Aesthetic)
+Design Teardown: Oceanic Pastel UI (Kawaii‑LoFi Aesthetic)
 
 Goal: Implement a playful, ocean‑themed landing page that pairs a professional product layout with warm, hand‑drawn/mascot illustrations. Visual language = soft gradients (sand ↔ sea), rounded geometric typography, glassy blue cards, and chubby, tactile buttons. No heavy shadows or neon; keep it creamy, friendly, and premium.
 
