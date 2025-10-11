@@ -1,0 +1,16 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="whistle-body" x1="16" y1="16" x2="84" y2="84" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE6C6"/>
+      <stop offset="1" stop-color="#FFAB70"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="22" width="64" height="44" rx="22" fill="url(#whistle-body)"/>
+  <path d="M40 22V16C40 13.7909 41.7909 12 44 12H52C54.2091 12 56 13.7909 56 16V22" stroke="#FF8A65" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="36" cy="44" r="6" fill="#2C2C2C"/>
+  <circle cx="60" cy="44" r="6" fill="#2C2C2C"/>
+  <path d="M34 56C36.6667 58 41.3333 60 48 60C54.6667 60 59.3333 58 62 56" stroke="#2C2C2C" stroke-width="4" stroke-linecap="round"/>
+  <path d="M72 34L82 28" stroke="#FF8A65" stroke-width="4" stroke-linecap="round"/>
+  <path d="M72 44H84" stroke="#FF8A65" stroke-width="4" stroke-linecap="round"/>
+  <path d="M72 54L82 60" stroke="#FF8A65" stroke-width="4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-sand-50: #FFF7EE;
+  --color-sand-100: #FCEAD6;
+  --color-sand-200: #F9D8B5;
+
+  --color-ink-500: #6C6C6C;
+  --color-ink-700: #4A4A4A;
+  --color-ink-900: #2C2C2C;
+  --color-line: #EDE3D8;
+
+  --color-sea-100: #BEEAFF;
+  --color-sea-300: #72C9FF;
+  --color-sea-500: #1FA4FF;
+  --color-sea-700: #178FFF;
+
+  --color-coral: #FF8A65;
+  --color-pearl: #FFE6C6;
+  --color-mint: #9BE7C4;
+
+  --font-display: var(--font-plus-jakarta);
+  --font-sans: var(--font-plus-jakarta);
+
+  --radius-xl: 16px;
+  --shadow-soft: 0 6px 18px rgba(31, 164, 255, 0.08);
+  --backdrop-blur-xs: 6px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #FFF7EE 0%, #FCEAD6 60%, #F9D8B5 100%);
+  color: var(--color-ink-900);
+  font-family: var(--font-plus-jakarta), "Poppins", "Helvetica Neue", Arial,
+    sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+.bg-sand {
+  background: linear-gradient(180deg, #FFF7EE 0%, #FCEAD6 60%, #F9D8B5 100%);
+}
+
+.bg-sea-shallow {
+  background: linear-gradient(180deg, #BEEAFF 0%, #72C9FF 60%, #1FA4FF 100%);
+}
+
+.bg-sea-deep {
+  background: linear-gradient(180deg, #72C9FF 0%, #1FA4FF 40%, #178FFF 100%);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.float {
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+}
+
+.float:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.mascot-bob {
+  animation: bob 3.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .mascot-bob {
+    animation: none;
+  }
+}
