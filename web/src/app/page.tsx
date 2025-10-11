@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 type Tone = "sand" | "sea-shallow" | "sea-deep";
 
 const featureCards = [
@@ -52,10 +54,15 @@ function Header() {
     <header className="sticky top-0 z-30 bg-[#fff7ee]/80 backdrop-blur supports-[backdrop-filter]:bg-[#fff7ee]/60">
       <div className="mx-auto flex max-w-[1240px] items-center justify-between px-6 py-4">
         <div className="flex items-center gap-2 text-[18px] font-semibold text-ink-900">
-          <span className="inline-flex size-8 items-center justify-center rounded-full bg-sea-100 text-ink-900">
-            SB
-          </span>
-          Sports Broadcast Lab
+          <Image
+            src="/logo.png"
+            alt="PlayVoice logo"
+            width={40}
+            height={40}
+            className="h-10 w-10"
+            priority
+          />
+          <span className="sr-only">PlayVoice</span>
         </div>
         <nav className="hidden items-center gap-6 text-[14px] font-medium text-ink-700 sm:flex">
           <a className="hover:opacity-80" href="#features">
@@ -118,7 +125,7 @@ function Hero() {
             ESPN for kids
           </h1>
           <p className="text-lg leading-7 text-ink-700 sm:text-xl sm:leading-8">
-            Give their highlights the big-league treatment. Upload the footage,
+            PlayVoice gives their highlights the big-league treatment. Upload the footage,
             and we turn every play into a broadcast-ready moment your family will keep forever.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -386,11 +393,17 @@ function Footer() {
       <div className="mx-auto flex max-w-[1120px] flex-col gap-8 px-6 md:flex-row md:justify-between">
         <div>
           <div className="flex items-center gap-2 text-xl font-semibold">
-            <span className="inline-flex size-8 items-center justify-center rounded-full bg-white/20">SB</span>
-            Sports Broadcast Lab
+            <Image
+              src="/logo.png"
+              alt="PlayVoice logo"
+              width={32}
+              height={32}
+              className="h-8 w-8"
+            />
+            <span className="sr-only">PlayVoice</span>
           </div>
           <p className="mt-3 max-w-sm text-sm text-white/80">
-            Custom commentary for youth sports footage—because every game deserves a play-by-play.
+            PlayVoice delivers custom commentary for youth sports footage—because every game deserves a play-by-play.
           </p>
         </div>
         <div className="grid max-w-md grid-cols-2 gap-6 text-sm text-white/75 sm:grid-cols-3">
@@ -420,7 +433,7 @@ function Footer() {
           </div>
         </div>
       </div>
-      <p className="mt-10 text-center text-xs text-white/60">© {new Date().getFullYear()} Sports Broadcast Lab. All rights reserved.</p>
+      <p className="mt-10 text-center text-xs text-white/60">© {new Date().getFullYear()} PlayVoice. All rights reserved.</p>
     </footer>
   );
 }

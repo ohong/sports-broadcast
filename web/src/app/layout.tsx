@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ESPN for kids | AI Sports Commentary Studio",
+  title: "PlayVoice | AI Sports Commentary Studio",
   description:
-    "Transform youth sports footage into ESPN-style highlights with AI-powered commentary built for kids and their biggest fans.",
+    "PlayVoice transforms youth sports footage into ESPN-style highlights with AI-powered commentary built for kids and their biggest fans.",
 };
 
 export default function RootLayout({
