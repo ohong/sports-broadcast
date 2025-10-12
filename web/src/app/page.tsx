@@ -69,9 +69,9 @@ function Header() {
           <Image
             src="/logo.png"
             alt="PlayVoice logo"
-            width={40}
-            height={40}
-            className="h-10 w-10"
+            width={60}
+            height={60}
+            className="h-15 w-15"
             priority
           />
           <span className="sr-only">PlayVoice</span>
@@ -403,9 +403,9 @@ function Footer() {
             <Image
               src="/logo.png"
               alt="PlayVoice logo"
-              width={32}
-              height={32}
-              className="h-8 w-8"
+              width={48}
+              height={48}
+              className="h-12 w-12"
             />
             <span className="sr-only">PlayVoice</span>
           </div>

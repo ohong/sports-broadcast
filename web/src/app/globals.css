@@ -36,20 +36,59 @@
   }
 
   body::before {
-    content: "";
+    content: '';
     position: fixed;
-    inset: 0;
-    background: radial-gradient(
-      circle at 20% 20%,
-      rgba(255, 230, 198, 0.45),
-      transparent 55%
-    );
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, 
+      rgba(255, 180, 100, 0.4) 0%, 
+      rgba(255, 220, 150, 0.45) 25%, 
+      rgba(255, 160, 80, 0.5) 50%, 
+      rgba(255, 200, 120, 0.45) 75%, 
+      rgba(255, 190, 110, 0.4) 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 10s ease infinite;
+    z-index: 0;
     pointer-events: none;
-    z-index: -1;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(255, 140, 60, 0.6) 0%, transparent 45%),
+      radial-gradient(circle at 80% 20%, rgba(255, 200, 100, 0.55) 0%, transparent 45%),
+      radial-gradient(circle at 40% 40%, rgba(255, 160, 70, 0.5) 0%, transparent 40%);
+    animation: pulse 6s ease-in-out infinite;
+    z-index: 1;
+    pointer-events: none;
   }
 
   main {
     isolation: isolate;
+    position: relative;
+    z-index: 10;
+  }
+
+  .page-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("/background.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.25;
+    z-index: -2;
+    animation: backgroundMove 45s ease-in-out infinite;
   }
 }
 
@@ -63,21 +102,17 @@
 
 .page-shell::before {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
-  background-image: linear-gradient(
-      180deg,
-      rgba(255, 247, 238, 0.65) 0%,
-      rgba(255, 230, 198, 0.45) 30%,
-      rgba(190, 234, 255, 0.38) 100%
-    ),
-    url("/background.png");
+  background-image: url("/background.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  opacity: 0.3;
   filter: saturate(1.05);
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
+  animation: backgroundMove 45s ease-in-out infinite;
 }
 
 @layer utilities {
@@ -154,5 +189,58 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes backgroundMove {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
+  }
+}
+
+@keyframes moveBackground {
+  0%, 100% {
+    transform: translate(0%, 0%) scale(1.05);
+  }
+  25% {
+    transform: translate(-2%, 1%) scale(1.08);
+  }
+  50% {
+    transform: translate(1%, -1%) scale(1.06);
+  }
+  75% {
+    transform: translate(2%, 1%) scale(1.07);
   }
 }
