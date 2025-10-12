@@ -4,6 +4,7 @@ import os
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 from elevenlabs import ElevenLabs, VoiceSettings  # type: ignore
@@ -15,10 +16,9 @@ from moviepy.editor import AudioFileClip, CompositeAudioClip, VideoFileClip  # t
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = BASE_DIR.parent
 
-DEFAULT_PROMPT_PATH = BASE_DIR / "prompts/boxing.md"
+DEFAULT_PROMPT_PATH = BASE_DIR / "prompts/soccer_kids.md"
 DEFAULT_VIDEO_PATH = BASE_DIR / "box.MOV"
 DEFAULT_OUTPUT_PATH = BASE_DIR / "box-commentated.mp4"
-DEFAULT_COMMENTARY_JSON = BASE_DIR / "commentary.json"
 
 
 @dataclass
@@ -328,24 +328,6 @@ def compute_interrupt_cutoffs(events: Sequence[CommentaryEvent]) -> List[Optiona
     return cutoffs
 
 
-def ensure_commentary_file(
-    video_path: Path,
-    prompt_path: Path,
-    api_key: str,
-    commentary_path: Path,
-    regenerate: bool,
-    model: str = "models/gemini-2.5-flash",
-) -> Commentary:
-    if regenerate or not commentary_path.exists():
-        commentary = generate_commentary(video_path, prompt_path, api_key, model=model)
-        commentary_path.parent.mkdir(parents=True, exist_ok=True)
-        commentary_path.write_text(json.dumps(commentary.to_dict(), indent=2))
-        return commentary
-
-    payload = json.loads(commentary_path.read_text())
-    return Commentary.from_dict(payload)
-
-
 def synthesize_events_to_disk(
     events: Sequence[CommentaryEvent],
     api_key: str,
@@ -492,9 +474,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--video", type=Path, default=DEFAULT_VIDEO_PATH, help="Input video path.")
     parser.add_argument("--prompt", type=Path, default=DEFAULT_PROMPT_PATH, help="Prompt file for Gemini.")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_PATH, help="Output video path.")
-    parser.add_argument("--commentary-json", type=Path, default=DEFAULT_COMMENTARY_JSON, help="Cache path for commentary JSON.")
-    parser.add_argument("--regenerate-commentary", action="store_true", help="Force regeneration of commentary even if cache exists.")
-    parser.add_argument("--skip-video", action="store_true", help="Only generate commentary JSON and narration clips.")
+    parser.add_argument("--commentary-json", type=Path, help="Optional path to write the generated commentary JSON.")
+    parser.add_argument("--skip-video", action="store_true", help="Generate narration only; requires --clips-dir to retain audio files.")
     parser.add_argument("--background-volume", type=float, default=0.45, help="Mix volume for the original video audio.")
     parser.add_argument("--commentary-volume", type=float, default=1.0, help="Mix volume for synthesized commentary.")
     parser.add_argument("--voice-id", type=str, default=os.getenv("ELEVENLABS_VOICE_ID"), help="ElevenLabs voice ID.")
@@ -508,7 +489,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--gemini-model", type=str, default="models/gemini-2.5-flash", help="Gemini model to use.")
     parser.add_argument("--stability", type=float, default=0.5, help="ElevenLabs stability parameter.")
     parser.add_argument("--similarity", type=float, default=0.65, help="ElevenLabs similarity boost parameter.")
-    parser.add_argument("--clips-dir", type=Path, default=BASE_DIR / ".cache/clips", help="Directory to store synthesized clips.")
+    parser.add_argument("--clips-dir", type=Path, help="Optional directory to store synthesized clips.")
     parser.add_argument("--output-format", type=str, default="mp3_44100_128", help="ElevenLabs audio output format, e.g. mp3_44100_128.")
     parser.add_argument("--disable-speaker-boost", action="store_true", help="Disable ElevenLabs speaker boost.")
     return parser.parse_args()
@@ -532,14 +513,19 @@ def main() -> None:
     voice2_id = args.voice2_id or args.voice_id
     voice_map = build_voice_map(args.voice_id, voice2_id)
 
-    commentary = ensure_commentary_file(
+    commentary = generate_commentary(
         args.video,
         args.prompt,
         gemini_api_key,
-        args.commentary_json,
-        regenerate=args.regenerate_commentary,
         model=args.gemini_model,
     )
+
+    if args.commentary_json:
+        args.commentary_json.parent.mkdir(parents=True, exist_ok=True)
+        args.commentary_json.write_text(json.dumps(commentary.to_dict(), indent=2))
+
+    if args.skip_video and not args.clips_dir:
+        raise RuntimeError("Provide --clips-dir when using --skip-video to retain generated clips.")
 
     play_by_play_name = commentary.commentators.get("playByPlay", "Play-by-Play")
     analyst_name = commentary.commentators.get("analyst", "Analyst")
@@ -548,33 +534,45 @@ def main() -> None:
     print(f"Play-by-play voice: {play_by_play_name} -> {play_voice_id}")
     print(f"Analyst voice: {analyst_name} -> {analyst_voice_id}")
 
+    temp_clip_dir: Optional[TemporaryDirectory[str]] = None
     clips_dir = args.clips_dir
-    clip_paths = synthesize_events_to_disk(
-        commentary.events,
-        eleven_api_key,
-        voice_map,
-        args.model_id,
-        clips_dir,
-        stability=args.stability,
-        similarity_boost=args.similarity,
-        output_format=args.output_format,
-        use_speaker_boost=not args.disable_speaker_boost,
-    )
+    if clips_dir:
+        clips_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        temp_clip_dir = TemporaryDirectory()
+        clips_dir = Path(temp_clip_dir.name)
 
-    if args.skip_video:
-        print(f"Generated commentary JSON at {args.commentary_json}")
-        print(f"Synthesized {len(clip_paths)} clips in {clips_dir}")
-        return
+    try:
+        clip_paths = synthesize_events_to_disk(
+            commentary.events,
+            eleven_api_key,
+            voice_map,
+            args.model_id,
+            clips_dir,
+            stability=args.stability,
+            similarity_boost=args.similarity,
+            output_format=args.output_format,
+            use_speaker_boost=not args.disable_speaker_boost,
+        )
 
-    mix_commentary_with_video(
-        args.video,
-        clip_paths,
-        commentary.events,
-        args.output,
-        background_volume=args.background_volume,
-        commentary_volume=args.commentary_volume,
-    )
-    print(f"Created narrated video at {args.output}")
+        if args.skip_video:
+            if args.commentary_json:
+                print(f"Wrote commentary JSON to {args.commentary_json}")
+            print(f"Synthesized {len(clip_paths)} clips in {clips_dir}")
+            return
+
+        mix_commentary_with_video(
+            args.video,
+            clip_paths,
+            commentary.events,
+            args.output,
+            background_volume=args.background_volume,
+            commentary_volume=args.commentary_volume,
+        )
+        print(f"Created narrated video at {args.output}")
+    finally:
+        if temp_clip_dir:
+            temp_clip_dir.cleanup()
 
 
 if __name__ == "__main__":

@@ -15,13 +15,14 @@ Requirements:
         "commentator": "playByPlay" | "analyst",
         "call": string,
         "context": string,
-        "interrupts": "playByPlay" | "analyst" | null
+        "interrupt": boolean
       }
     ]
   }
 - The "commentators" object should contain names for both commentators (e.g., "Jim Lampley" and "Roy Jones Jr." or create realistic names).
 - "commentator" field indicates who is speaking: "playByPlay" (main narrator) or "analyst" (color commentary/expert analysis).
-- "interrupts" is optional and should be included ONLY when this call cuts off the other commentator mid-sentence due to a dramatic moment. When present, set it to the role being interrupted ("playByPlay" or "analyst"). Omit the field or set it to null otherwise.
+- "interrupt" field should be true ONLY when this call interrupts the PREVIOUS commentator mid-sentence due to a dramatic moment. Default is false.
+- CRITICAL: You can ONLY interrupt if the previous call was from a DIFFERENT commentator. The same commentator cannot interrupt themselves.
 - Timestamps must be chronological and correspond to when the described moment happens in the video.
 - "call" should be an energetic broadcast call appropriate to each commentator's role.
 - "context" should add concise detail such as fighter names (if visible), punch combinations, scoring moments, or fight statistics.
@@ -42,17 +43,25 @@ CRITICAL TIMING AND SPACING RULES (MOST IMPORTANT):
 - Do NOT create a call every 7 seconds—wait much longer when appropriate. Silence is good.
 - For a 60-second video clip, aim for approximately 5-8 total commentary calls MAX.
 
-INTERRUPT EXCEPTIONS:
-- ONLY when something truly dramatic and unexpected happens (knockdown, illegal blow, referee stoppage, fighter hurt badly), include the "interrupts" field.
-- An interrupt call can arrive less than 7 seconds after the previous call—this simulates one commentator cutting off the other mid-sentence.
+INTERRUPT RULES AND LOGIC:
+- An interrupt can ONLY happen when a DIFFERENT commentator cuts off the previous speaker.
+- Example: analyst is speaking at 00:08, then playByPlay interrupts at 00:11 with "interrupt": true ✓
+- Example: playByPlay is speaking at 00:08, then playByPlay again at 00:11 with "interrupt": true ✗ WRONG - same person can't interrupt themselves
+- ONLY use interrupts when something truly dramatic and unexpected happens (knockdown, illegal blow, referee stoppage, fighter badly hurt).
+- An interrupt can occur less than 7 seconds after the previous call—this simulates one commentator cutting off the other mid-sentence.
 - Interrupts should be RARE—perhaps 1-2 times in an entire match, only for the most shocking moments.
-- The interrupting call should be short, urgent, and explosive (e.g., "OH! HE'S DOWN!" or "WAIT! THE REFEREE'S STOPPING IT!").
+- The interrupting call should be short, urgent, and explosive (e.g., "OH! HE'S DOWN!" or "WAIT! THE REFEREE'S STOPPING IT!")
 - After an interrupt, return to normal 7+ second spacing.
 
-Example of proper interrupt usage:
-- 00:08 - analyst: "He's really controlling the pace here with that jab..." (no "interrupts" field)
-- 00:12 - playByPlay: "OH MY! A HUGE RIGHT HAND! HE'S HURT!" ("interrupts": "analyst") ← Only 4 seconds later because of dramatic moment
-- 00:22 - analyst: "That was absolutely devastating..." (no "interrupts" field) ← Back to normal spacing
+Example of CORRECT interrupt usage:
+- 00:08 - analyst: "He's really controlling the pace here with that jab..." (interrupt: false)
+- 00:12 - playByPlay: "OH MY! A HUGE RIGHT HAND! HE'S HURT!" (interrupt: true) ← Different commentator interrupting
+- 00:22 - analyst: "That was absolutely devastating..." (interrupt: false)
+
+Example of INCORRECT interrupt usage:
+- 00:08 - playByPlay: "Nice body work here..." (interrupt: false)
+- 00:11 - playByPlay: "OH! BIG RIGHT HAND!" (interrupt: true) ✗ WRONG - same commentator can't interrupt themselves
+- Correct version: Just set interrupt: false and space it 7+ seconds later, OR have the analyst interrupt instead
 
 WHAT SHOULD BE COMMENTED ON:
 - Commentate on only the MOST significant moments—perhaps 1 out of every 6-8 punches or exchanges.
