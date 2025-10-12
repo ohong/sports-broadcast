@@ -114,6 +114,14 @@
     backdrop-filter: blur(10px);
   }
 
+  .loader {
+    display: inline-block;
+    border-radius: 9999px;
+    border: 3px solid rgba(31, 164, 255, 0.25);
+    border-top-color: var(--color-sea-700);
+    animation: spin 0.8s linear infinite;
+  }
+
   .float {
     transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
   }
@@ -140,5 +148,11 @@
   }
   50% {
     transform: translateY(-6px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

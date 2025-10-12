@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+import UploadWidget from "./components/upload-widget";
+
 type Tone = "sand" | "sea-shallow" | "sea-deep";
 
 const featureCards = [
@@ -129,12 +131,7 @@ function Hero() {
             and we turn every play into a broadcast-ready moment your family will keep forever.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <a
-              href="#cta"
-              className="float inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-[#ffd39a] to-[#ffab70] px-6 py-3 text-base font-semibold text-ink-900 shadow-soft"
-            >
-              Upload a game
-            </a>
+            <UploadWidget />
             <a
               href="#features"
               className="inline-flex items-center justify-center rounded-xl border border-line px-6 py-3 text-base font-semibold text-ink-700 hover:bg-white/70"

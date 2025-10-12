@@ -1,1 +1,5 @@
 .env
+uploads/
+py/.cache/
+py/commentary.json
+web/public/processed/
