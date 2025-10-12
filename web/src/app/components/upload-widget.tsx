@@ -4,10 +4,13 @@ import { useCallback, useRef, useState, type ChangeEvent } from "react";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 
-export default function UploadWidget() {
+type UploadWidgetProps = {
+  onProcessed?: (payload: { videoUrl: string }) => void;
+};
+
+export default function UploadWidget({ onProcessed }: UploadWidgetProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [status, setStatus] = useState<UploadStatus>("idle");
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleButtonClick = useCallback(() => {
@@ -25,7 +28,6 @@ export default function UploadWidget() {
 
     setStatus("uploading");
     setError(null);
-    setVideoUrl(null);
 
     const payload = new FormData();
     payload.append("video", file);
@@ -44,7 +46,7 @@ export default function UploadWidget() {
         throw new Error(message);
       }
 
-      setVideoUrl(data.videoUrl);
+      onProcessed?.({ videoUrl: data.videoUrl });
       setStatus("success");
     } catch (uploadError) {
       const message =
@@ -54,7 +56,7 @@ export default function UploadWidget() {
       setError(message);
       setStatus("error");
     }
-  }, []);
+  }, [onProcessed]);
 
   return (
     <div className="w-full max-w-xl flex-1">
@@ -89,15 +91,9 @@ export default function UploadWidget() {
         </div>
       )}
 
-      {videoUrl && (
-        <div className="mt-6 rounded-3xl border border-line bg-white/85 p-4 shadow-soft">
-          <p className="text-sm font-semibold text-ink-900">Your narrated game is ready</p>
-          <video
-            controls
-            src={videoUrl}
-            className="mt-3 w-full rounded-2xl"
-            preload="metadata"
-          />
+      {status === "success" && !error && (
+        <div className="mt-4 rounded-2xl border border-line bg-white/85 px-4 py-3 text-sm font-semibold text-ink-900 shadow-soft">
+          Your narrated game is ready!
         </div>
       )}
     </div>

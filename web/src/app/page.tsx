@@ -1,5 +1,7 @@
-import Image from "next/image";
+'use client';
 
+import { useState } from "react";
+import Image from "next/image";
 import UploadWidget from "./components/upload-widget";
 
 type Tone = "sand" | "sea-shallow" | "sea-deep";
@@ -50,6 +52,14 @@ const workflow = [
 ];
 
 const sports = ["Basketball", "Soccer", "Baseball", "Lacrosse", "Volleyball", "Hockey"];
+
+const demoSubtitles = [
+  { time: "00:06", speaker: "Play-by-Play", text: "Harper skies for the board, kicks to MJ—corner three on the way!" },
+  { time: "00:11", speaker: "Analyst", text: "That’s six straight points for the Wolves. The Lions need a timeout soon." },
+  { time: "00:18", speaker: "Play-by-Play", text: "Mia pokes it loose, streaks ahead—left-handed finish plus the foul!" },
+  { time: "00:28", speaker: "Analyst", text: "Listen to that crowd. They know Mia just shifted the whole momentum." },
+  { time: "00:39", speaker: "Play-by-Play", text: "Final seconds—kick-out to Harper… nails it! Ballgame, Wolves by two!" },
+];
 
 function Header() {
   return (
@@ -114,7 +124,7 @@ function MascotBubbles() {
   );
 }
 
-function Hero() {
+function Hero({ onVideoReady }: { onVideoReady: (videoUrl: string) => void }) {
   return (
     <Section tone="sand">
       <div className="relative mx-auto flex max-w-[1180px] flex-col gap-12 px-6 lg:flex-row lg:items-center">
@@ -131,7 +141,7 @@ function Hero() {
             and we turn every play into a broadcast-ready moment your family will keep forever.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <UploadWidget />
+            <UploadWidget onProcessed={({ videoUrl }) => onVideoReady(videoUrl)} />
             <a
               href="#features"
               className="inline-flex items-center justify-center rounded-xl border border-line px-6 py-3 text-base font-semibold text-ink-700 hover:bg-white/70"
@@ -472,11 +482,17 @@ function WaveIcon() {
 }
 
 export default function Home() {
+  const [processedVideoUrl, setProcessedVideoUrl] = useState<string | null>(null);
+
+  if (processedVideoUrl) {
+    return <BroadcastResult videoUrl={processedVideoUrl} onReset={() => setProcessedVideoUrl(null)} />;
+  }
+
   return (
     <>
       <Header />
       <main className="flex flex-col">
-        <Hero />
+        <Hero onVideoReady={setProcessedVideoUrl} />
         <Features />
         <Stats />
         <Workflow />
@@ -486,5 +502,58 @@ export default function Home() {
       </main>
       <Footer />
     </>
+  );
+}
+
+function BroadcastResult({ videoUrl, onReset }: { videoUrl: string; onReset: () => void }) {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#0d1a2f] via-[#112f5f] to-[#0b1530] px-6 py-16 text-white">
+      <div className="mx-auto flex max-w-[1080px] flex-col items-center gap-10 text-center">
+        <div className="w-full space-y-4">
+          <p className="text-sm uppercase tracking-[0.28em] text-white/70">Your broadcast is ready</p>
+          <h1 className="text-balance text-4xl font-semibold leading-tight sm:text-5xl">Relive the highlight reel</h1>
+        </div>
+        <div className="w-full rounded-[36px] border border-white/25 bg-black/70 p-4 shadow-[0_24px_60px_rgba(13,57,115,0.45)]">
+          <video
+            controls
+            autoPlay
+            src={videoUrl}
+            className="aspect-video w-full rounded-[28px] bg-black object-cover"
+          />
+        </div>
+        <SubtitlesPanel />
+        <button
+          type="button"
+          onClick={onReset}
+          className="float mt-4 inline-flex items-center justify-center rounded-xl border border-white/40 bg-white/10 px-6 py-3 text-sm font-semibold tracking-wide text-white hover:bg-white/15"
+        >
+          Upload another game
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function SubtitlesPanel() {
+  return (
+    <section className="w-full rounded-[32px] border border-white/20 bg-white/90 p-6 text-left text-ink-900 shadow-soft sm:p-8">
+      <header className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+        <h2 className="text-2xl font-semibold text-ink-900">Subtitles</h2>
+        <p className="text-sm font-medium uppercase tracking-[0.2em] text-ink-700">
+          Play-by-play transcript
+        </p>
+      </header>
+      <ul className="mt-5 space-y-4 text-sm leading-6 text-ink-700 sm:text-base">
+        {demoSubtitles.map((caption) => (
+          <li key={caption.time} className="rounded-2xl border border-line bg-white/85 px-4 py-3 shadow-soft">
+            <div className="flex items-center justify-between text-[13px] font-semibold uppercase tracking-[0.22em] text-ink-700">
+              <span>{caption.time}</span>
+              <span>{caption.speaker}</span>
+            </div>
+            <p className="mt-2 text-[15px] text-ink-900">{caption.text}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
