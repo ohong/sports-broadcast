@@ -80,25 +80,34 @@ class ToolhouseClient:
             )
             
             if response.status_code == 200:
-                response_data = response.json()
-                # Extract the actual response content
-                # The structure may vary depending on Toolhouse's response format
-                if isinstance(response_data, dict):
-                    # Try common response field names
-                    for field in ['response', 'message', 'content', 'output', 'text']:
-                        if field in response_data:
-                            return str(response_data[field])
-                    # If no common field found, return the whole response as string
-                    return str(response_data)
-                else:
-                    return str(response_data)
+                # Check if response is empty
+                if not response.text.strip():
+                    return "Empty response received from agent"
+                
+                # Try to parse as JSON
+                try:
+                    response_data = response.json()
+                    # Extract the actual response content
+                    # The structure may vary depending on Toolhouse's response format
+                    if isinstance(response_data, dict):
+                        # Try common response field names
+                        for field in ['response', 'message', 'content', 'output', 'text', 'data']:
+                            if field in response_data:
+                                return str(response_data[field])
+                        # If no common field found, return the whole response as string
+                        return str(response_data)
+                    else:
+                        return str(response_data)
+                except json.JSONDecodeError:
+                    # If it's not JSON, return the raw text
+                    return response.text
             else:
                 raise Exception(f'HTTP Error {response.status_code}: {response.text}')
                 
         except requests.exceptions.RequestException as e:
             raise Exception(f'Request failed: {str(e)}')
-        except json.JSONDecodeError as e:
-            raise Exception(f'Failed to parse JSON response: {str(e)}')
+        except Exception as e:
+            raise Exception(f'Unexpected error: {str(e)}')
 
 
 def main():
