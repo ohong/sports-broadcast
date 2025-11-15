@@ -1,5 +1,5 @@
 # sports-broadcast
-ESPN for teenagers: Generate pro-quality play-by-play commentary for youth sports footage. Uses Gemini video understanding + ElevenLabs voice model.
+ESPN for kids: Generate pro-quality play-by-play commentary for youth sports footage. Uses Gemini video understanding + ElevenLabs voice model.
 
 ## Overview
 
